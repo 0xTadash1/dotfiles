@@ -1,0 +1,9 @@
+[init]
+	defaultBranch = main
+[core]
+	sshCommmand = "ssh -i ~/.ssh/github.id_ed25519 -F none"
+[user]
+	name = 0xTadash1
+	email = 56265995+0xTadash1@users.noreply.github.com
+[includeIf "gitdir:~/Projects/Univ/"]
+	path = ~/Projects/Univ/.gitconfig
