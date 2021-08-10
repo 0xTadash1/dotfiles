@@ -1,5 +1,5 @@
 [core]
 	sshCommand = "ssh -i ~/.ssh/github.univ.id_ed25519 -F none"
 [user]
-        name = {{ (bitwardenFields "item" "Projects/Univ/.gitconfig").user-name.value }}
-        email = {{ (bitwardenFields "item" "Projects/Univ/.gitconfig").user-email.value }}
+	name = {{ (bitwardenFields "item" "Projects/Univ/.gitconfig").user_name.value }}
+	email = {{ (bitwardenFields "item" "Projects/Univ/.gitconfig").user_email.value }}
