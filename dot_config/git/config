@@ -1,7 +1,7 @@
 [init]
 	defaultBranch = main
 [core]
-	sshCommmand = "ssh -i ~/.ssh/github.id_ed25519 -F none"
+	sshCommmand = "ssh -i $HOME/.ssh/id_ed25519_github -F none"
 [user]
 	name = 0xTadash1
 	email = 56265995+0xTadash1@users.noreply.github.com
