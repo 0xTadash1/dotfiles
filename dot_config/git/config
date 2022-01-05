@@ -7,3 +7,5 @@
 	email = 56265995+0xTadash1@users.noreply.github.com
 [includeIf "gitdir:~/Projects/Univ/"]
 	path = ~/Projects/Univ/.gitconfig
+[merge]
+	ff = no
