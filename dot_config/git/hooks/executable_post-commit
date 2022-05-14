@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+dijo -c "track-up commits"
