@@ -68,7 +68,7 @@ zinit wait'0ra' lucid light-mode for \
 
 
 zirs for \
-  sbin'*/bat' from'gh-r' bpick'*x86_64-unknown-linux-gnu*' \
+  sbin'*/bat' from'gh-r' bpick'*x86_64-unknown-linux-gnu*' nocompile \
     atclone'
       =ln -svf "$PWD/"**/bat.zsh "$PWD/_bat" `: "${ZINIT[COMPLETIONS_DIR]}/_bat"` \
       && echo "After the installation/update is completed, please do \`zinit compinit\` "
@@ -77,7 +77,7 @@ zirs for \
     atload$'
       export MANPAGER="sh -c \'col -bx | bat -l man -p\'"
       alias cat=\'=bat -pp\'
-      alias bat=\'bat --italic-text=always\'
+      alias bat=\'bat --italic-text=always --tabs 6\'
       alias -g B=\'|bat\'' @sharkdp/bat \
   id-as'__theme_Enki-Tokyo-Night' as'null' \
     atclone'
@@ -95,48 +95,41 @@ zirs for \
     atload'export BAT_THEME="Enki-Tokyo-Night"' \
     https://raw.githubusercontent.com/enkia/enki-theme/master/scheme/Enki-Tokyo-Night.tmTheme
 
-zirs for sbin'btm' from'gh-r' bpick'*x86_64-unknown-linux-gnu.tar.gz' @ClementTsang/bottom
-# TODO: gitconfig
-zirs for sbin'*/delta' from'gh-r' bpick'*x86_64-unknown-linux-gnu*' \
+zirs for sbin'btm' from'gh-r' bpick'*x86_64-unknown-linux-gnu.tar.gz' nocompile @ClementTsang/bottom
+zirs for sbin'*/delta' from'gh-r' bpick'*x86_64-unknown-linux-gnu*' nocompile \
   atclone'=cp -vf **/delta.zsh _delta && zinit creinstall delta' atpull'%atclone' \
   atload'' @dandavison/delta
 
-# TODO: Read docs more, Use more
 # https://github.com/NerdyPepper/dijo/wiki/Auto-Habits
-zirs for sbin'dijo* -> dijo' from'gh-r' bpick'*x86_64-linux' \
+zirs for sbin'dijo* -> dijo' from'gh-r' bpick'*x86_64-linux' nocompile \
   atclone'#mansym $PWD/**/dijo.1 https://github.com/nerdypepper/dijo/issues/116' atpull'%atclone' \
   @nerdypepper/dijo
 
-zirs for sbin'bin/dog' from'gh-r' bpick'*x86_64-unknown-linux-gnu.zip' \
+zirs for sbin'bin/dog' from'gh-r' bpick'*x86_64-unknown-linux-gnu.zip' nocompile \
   atclone'=mv -vf **/dog.zsh _dog; mansym $PWD/**/dog.1' atpull'%atclone' @ogham/dog
-zirs for sbin'*/dust' from'gh-r' bpick'*x86_64-unknown-linux-gnu*' @bootandy/dust
+zirs for sbin'*/dust' from'gh-r' bpick'*x86_64-unknown-linux-gnu*' nocompile @bootandy/dust
 # zirs for id-as'eva' cargo'!eva' @zdharma-continuum/null  # released is old, Alt `bc`, @NerdyPepper/eva
-# TODO: Aliases
-zirs for sbin'*/exa' from'gh-r' bpick'*linux-x86_64-v*' \
+zirs for sbin'*/exa' from'gh-r' bpick'*linux-x86_64-v*' nocompile \
   cp'**/exa.zsh -> _exa' \
   atclone'zinit creinstall exa; mansym $PWD/**/exa.1; mansym $PWD/**/exa_colors.5' \
   atpull'%atclone' \
   @ogham/exa
 
-# TODO: Aliases
-zirs for sbin'*/fd' from'gh-r' bpick'*x86_64-unknown-linux*' \
+zirs for sbin'*/fd' from'gh-r' bpick'*x86_64-unknown-linux*' nocompile \
   atclone'zinit creinstall fd; mansym $PWD/**/fd.1' atpull'%atclone' \
   atload"" \
   @sharkdp/fd
 
-zirs for sbin'grex' from'gh-r' bpick'*x86_64-unknown-linux*' @pemistahl/grex
-zirs for sbin'*/hexyl' from'gh-r' bpick'*x86_64-unknown-linux-gnu*' @sharkdp/hexyl
+zirs for sbin'grex' from'gh-r' bpick'*x86_64-unknown-linux*' nocompile @pemistahl/grex
+zirs for sbin'*/hexyl' from'gh-r' bpick'*x86_64-unknown-linux-gnu*' nocompile @sharkdp/hexyl
 # zirs for id-as'jql' cargo'!jql' @zdharma-continuum/null  # cargo only, @yamafaktory/jql
-# TODO: Read docs more, Use more
-zirs for sbin'procs' from'gh-r' bpick'*x86_64-lnx*' @dalance/procs
-# TODO: Aliases
-zirs for sbin'*/rg' from'gh-r' bpick'*x86_64-unknown-linux*' \
+zirs for sbin'*/rg' from'gh-r' bpick'*x86_64-unknown-linux*' nocompile \
   atclone'mansym $PWD/**/rg.1' atpull'%atclone' atload$'alias -g R=\'|rg\'' @BurntSushi/ripgrep
 
-zirs for sbin'sd' from'gh-r' bpick'*x86_64-unknown-linux-gnu' cp'sd* -> sd' @chmln/sd
+zirs for sbin'sd' from'gh-r' bpick'*x86_64-unknown-linux-gnu' nocompile cp'sd* -> sd' @chmln/sd
 # A terminal interface for Stack Overflow
-zirs for sbin'so' from'gh-r' bpick'*x86_64-unknown-linux-gnu*' @samtay/so
-zirs for sbin'tealdeer* -> tldr' from'gh-r' bpick'tealdeer-linux-x86_64-musl' \
+zirs for sbin'so' from'gh-r' bpick'*x86_64-unknown-linux-gnu*' nocompile @samtay/so
+zirs for sbin'tealdeer* -> tldr' from'gh-r' bpick'tealdeer-linux-x86_64-musl' nocompile \
   atclone'
     ./tealdeer* -u > /dev/null
     curl -o _tldr https://raw.githubusercontent.com/dbrgn/tealdeer/main/completion/zsh_tealdeer
@@ -146,7 +139,7 @@ zirs for sbin'tealdeer* -> tldr' from'gh-r' bpick'tealdeer-linux-x86_64-musl' \
 
 # @BurntSushi/xsv  # it's sleeping, fork: @jqnatividad/qsv
 # TODO: eval script
-zirs for sbin'zoxide' from'gh-r' bpick'*x86_64-unknown-linux*' \
+zirs for sbin'zoxide' from'gh-r' bpick'*x86_64-unknown-linux*' nocompile \
   atclone'for f in ./man/*; do mansym $PWD/$f; done' atpull'%atclone' \
   atload'eval "$(zoxide init zsh)"' @ajeetdsouza/zoxide
 
@@ -159,13 +152,20 @@ unalias zirs
 #
 alias zigo='zinit wait"0gb" lucid light-mode'
 
-# TODO: all
-# zinit wait"0ga" lucid light-mode for @stefanmaric/g
-
 
 zigo for \
-  sbin'fzf' from'gh-r' bpick'*linux_amd64.tar.gz' \
-    @junegunn/fzf \
+  sbin'fzf' from'gh-r' bpick'*linux_amd64.tar.gz' nocompile \
+    atload$'
+      # @catppuccin/fzf
+      export FZF_DEFAULT_OPTS=\'--height 40% --layout reverse --color=bg+:#302D41,bg:#1E1E2E,spinner:#F8BD96,hl:#F28FAD --color=fg:#D9E0EE,header:#F28FAD,info:#DDB6F2,pointer:#F8BD96 --color=marker:#F8BD96,fg+:#F2CDCD,prompt:#DDB6F2,hl+:#F28FAD\'
+
+      export FZF_CTRL_T_COMMAND=\'fd --type file --hidden --exclude .git\'
+      export FZF_CTRL_T_OPTS=\'
+        --preview "
+          echo \\"\\\\033[1;4m\\"${"$(file {})":t:s/\\: /\\"\\\\033[0;3;90m \\"/}\\"\\\\033[m\\"
+          bat -pp -f --italic-text=always --tabs 6 -r :200 {}"
+        --preview-window border-left\'
+    ' @junegunn/fzf \
   id-as'_fzf' as'completion' \
     https://raw.githubusercontent.com/junegunn/fzf/master/shell/completion.zsh \
   id-as'__fzf_1' atclone'=cp -f __fzf_1 fzf.1; mansym $PWD/fzf.1' atpull'%atclone' \
@@ -329,26 +329,6 @@ zinit `: light-mode` for \
     HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1' \
     zsh-users/zsh-history-substring-search
 
-# Additional completion method `zsh-autocomplete` (Doesn't work well with lazy loading)
-# Also `zsh-history-substring-search` may not work with `zsh-autocomplete`
-# zinit light-mode for \
-#   atinit'ZINIT[COMPINIT_OPTS]=-C; zicompinit; zicdreplay' \
-#     zdharma-continuum/fast-syntax-highlighting \
-#   atload'_zsh_autosuggest_start; ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=8,underline"' \
-#     zsh-users/zsh-autosuggestions \
-#   blockf \
-#     zsh-users/zsh-completions \
-#   blockf depth'1' atinit'
-#     zstyle ":autocomplete:*" list-lines 8
-#     zstyle ":autocomplete:*" widget-style menu-select
-#     [[ $(command -v zoxide) ]] && zstyle ":autocomplete:*" recent-dirs zoxide
-#     [[ $(command -v fzf) ]] && zstyle ":autocomplete:*" fzf-completion yes' \
-#     marlonrichert/zsh-autocomplete \
-#   blockf atload'
-#     bindkey "$terminfo[kcuu1]" history-substring-search-up
-#     bindkey "$terminfo[kcud1]" history-substring-search-down' \
-#     zsh-users/zsh-history-substring-search
-
 
 # Finalizer: When use wait'' mod with Exclamation mark, it reflesh prompt on loading finished 
 zinit wait'!0zz' lucid for id-as'Finalizer' as'null' \
@@ -367,15 +347,21 @@ zinit wait'!0zz' lucid for id-as'Finalizer' as'null' \
 # SECTION Sequential Loading
 #
 #
-# TODO: `atclone''` func; read "SETUP 1/2: for Kitty"; p10k configure && mv $ZDOTDIR/.p10k.zsh ... 
+
 # Doesn't work well with lazy loading
-zinit light-mode for \
-  depth'1' atclone'[[ ! -f $ZDOTDIR/.p10k.zsh ]] && p10k configure' \
+#zinit light-mode for \
+#  depth'1' atclone'[[ ! -f $ZDOTDIR/.p10k.zsh ]] && p10k configure' \
+#  if'[[ ! $TERM = "linux" ]]' \
+#  atload'
+#    . $ZDOTDIR/.p10k.zsh
+#    _p9k_precmd; (( ! ${+functions[p10k]} )) || p10k finalize' \
+#  romkatv/powerlevel10k
+
+zinit light-mode for sbin'posh-linux-amd64 -> oh-my-posh' from'gh-r' bpick'posh-linux-amd64' nocompile \
   if'[[ ! $TERM = "linux" ]]' \
-  atload'
-    . $ZDOTDIR/.p10k.zsh
-    _p9k_precmd; (( ! ${+functions[p10k]} )) || p10k finalize' \
-  romkatv/powerlevel10k
+  atclone'./posh-linux-amd64 completion > _oh-my-posh' atpull'%atclone' \
+  atload'eval "$(./posh-linux-amd64 init zsh --config $XDG_CONFIG_HOME/omp/prompt.omp.json)"' \
+  @JanDeDobbeleer/oh-my-posh
 
 # Doesn't work well with lazy loading
 # zinit light-mode for depth'1' jeffreytse/zsh-vi-mode
