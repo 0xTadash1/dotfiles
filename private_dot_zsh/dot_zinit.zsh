@@ -299,7 +299,7 @@ unalias zicomp
 # SECTION Other  e.g. completion, prompt, syntax-highlight...
 #
 
-zinit `: light-mode` for \
+zinit wait'1' lucid for \
   atinit'ZINIT[COMPINIT_OPTS]=-C; zicompinit; zicdreplay' \
     zdharma-continuum/fast-syntax-highlighting \
   atload'_zsh_autosuggest_start; ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=8,underline"' \
