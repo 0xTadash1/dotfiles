@@ -1,2 +1,2 @@
 export ZDOTDIR="$HOME/.zsh"
-export HISTFILE="${ZDOTDIR:-HOME}/.zhist"
+export HISTFILE="${ZDOTDIR:-$HOME}/.zsh_history"
