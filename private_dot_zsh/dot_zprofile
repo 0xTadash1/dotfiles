@@ -1,0 +1,3 @@
+emulate -R sh -c 'source "$HOME/.profile"'
+
+export READNULLCMD=$PAGER

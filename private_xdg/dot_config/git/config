@@ -1,0 +1,82 @@
+[user]
+	name = 0xTadash1
+	email = 56265995+0xTadash1@users.noreply.github.com
+[init]
+	defaultBranch = main
+[core]
+	sshCommmand = "ssh -i $HOME/.ssh/id_ed25519_github -F none"
+	hooksPath = ~/xdg/.config/git/hooks
+	autocrlf = input
+	pager = delta
+[remote "origin"]
+	fetch = +refs/notes/*:refs/notes/*
+[log]
+	abbrevCommit = true
+	date = format:%Y/%m/%d %T
+[fetch]
+	prune = true
+[merge]
+	ff = false
+	conflictstyle = zdiff3
+[pull]
+	ff = only
+	rebase = false
+[rebase]
+	autoStash = true
+	autoSquash = true
+[interactive]
+	diffFilter = delta --color-only
+[diff]
+	colorMoved = default
+	algorithm = histogram
+	# TODO: Use neovim instead?
+	tool = kitty
+	guitool = kitty.gui
+[difftool]
+	prompt = false
+	trustExitCode = true
+[difftool "kitty"]
+	cmd = kitty +kitten diff $LOCAL $REMOTE
+[difftool "kitty.gui"]
+	cmd = kitty kitty +kitten diff $LOCAL $REMOTE
+[delta]
+	light = false
+	# To jump between files/commits by pressing n/N key. But it doesn't work for me.
+	navigate = true
+	line-numbers = true
+[include]
+	# Style for delta
+	# `curl -o "$XDG_CONFIG_HOME/git/tokyonight_night.gitconfig" 'https://raw.githubusercontent.com/folke/tokyonight.nvim/main/extras/delta/tokyonight_night.gitconfig'`
+	path = tokyonight_night.gitconfig
+[alias]
+	s = status --short --untracked-files
+	st = status
+	df = diff
+	dfx = -c delta.side-by-side=true diff
+	dft = difftool
+	dfg = difftool -g
+	stat = diff --stat
+	dfs = df --staged
+	dfxs = dfx --staged
+	dfts = dft --staged
+	dfgs = dfg --staged
+	stats = stat --staged
+	# TODO: Use `restore` instead?
+	unstage = reset HEAD --
+	cm = commit -m
+	ck = checkout
+	br = branch
+	sw = switch
+	ps = push
+	push-notes = push origin refs/notes/*
+	pl = pull
+	mergeff = -c merge.ff=true merge
+	graph = log --graph
+	oneline = log --pretty='format:%Cblue%<|(8)%aN %<(32,trunc)%Cred%s%C(auto)%>>(16,trunc)%d %Cgreen%>(13,trunc)%cr %C(auto)%h'
+	ln = oneline
+	tree = oneline --graph
+	last = log -1 HEAD
+	inicommit = ! git init && git add -A && git commit -m \"init\"
+	bra = branch
+[includeIf "gitdir:~/Projects/Univ/"]
+	path = ~/Projects/Univ/.gitconfig
