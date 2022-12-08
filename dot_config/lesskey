@@ -1,9 +1,0 @@
-h noaction 4\e(
-j noaction 2e
-k noaction 2y
-l noaction 4\e)
-
-^H noaction 1\e(
-^J noaction 1e
-^K noaction 1y
-^L noaction 1\e)

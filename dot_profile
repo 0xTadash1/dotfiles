@@ -1,0 +1,23 @@
+export XDG_CONFIG_HOME="$HOME/xdg/.config"
+export XDG_CACHE_HOME="$HOME/xdg/.cache"
+export XDG_DATA_HOME="$HOME/xdg/.local/share"
+export XDG_STATE_HOME="$HOME/xdg/.local/state"
+
+#export XDG_DATA_DIRS="$XDG_DATA_HOME/flatpack/exports/share:/var/lib/flatpak/exports/share:/usr/local/share/:/usr/share/"
+
+export VISUAL=nvim
+export EDITOR=$VISUAL
+export PAGER=less
+
+
+##
+# Input Method
+#
+im=fcitx
+export GTK_IM_MODULE=$im
+export QT_IM_MODULE=$im
+export XMODIFIERS="@im=$im"
+export SDL_IM_MODULE=$im
+export INPUT_METHOD=$im
+unset im
+export GLFW_IM_MODULE=ibus

@@ -1,0 +1,35 @@
+#env
+# NOTE: The variables below override the env variables set by you or your shell
+
+#LESS = --tilde --tabs=6 --chop-long-lines --mouse --shift=4 --jump-target=.5 --ignore-case --incsearch --RAW-CONTROL-CHARS --use-color -DCK$DEkR$DPBk$DMCk$DNK$DSkY$DWkM$DRk$ --LINE-NUMBERS --line-num-width=5 --status-column --status-col-width=1 --HILITE-UNREAD --quit-if-one-screen --file-size
+
+# No create a history file
+#   > If set to "-" or "/dev/null", a history file is not used.
+#   > The default is "$XDG_DATA_HOME/lesshst" or "$HOME/.lesshst"
+#   > -- less(1)
+LESSHISTFILE = -
+
+#command
+
+\e\e	undo-hilite
+
+:h	help
+:bn	next-file
+:bp	prev-file
+
+h	noaction	4\e(
+j	noaction	2e
+k	noaction	2y
+l	noaction	4\e)
+
+H	noaction	1\e(
+J	forw-line
+K	back-line
+L	noaction	1\e)
+
+^H	noaction	8\e(
+^J	forw-scroll
+^K	back-scroll
+^L	noaction	8\e)
+
+#line-edit
