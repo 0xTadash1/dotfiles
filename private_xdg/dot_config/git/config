@@ -66,6 +66,7 @@
 	cm = commit -m
 	ck = checkout
 	br = branch
+	bra = branch -a
 	sw = switch
 	ps = push
 	push-notes = push origin refs/notes/*
@@ -77,6 +78,5 @@
 	tree = oneline --graph
 	last = log -1 HEAD
 	inicommit = ! git init && git add -A && git commit -m \"init\"
-	bra = branch
 [includeIf "gitdir:~/Projects/Univ/"]
 	path = ~/Projects/Univ/.gitconfig
