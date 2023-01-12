@@ -63,10 +63,18 @@
 	stats = stat --staged
 	# TODO: Use `restore` instead?
 	unstage = reset HEAD --
+	a = add
+	A = add -A
+	c = commit
+	ca = commit -a
 	cm = commit -m
+	cam = commit -am
+	amend = commit --amend
+	aamend = commit -a --amend
 	ck = checkout
 	br = branch
 	bra = branch -a
+	brr = branch -r
 	sw = switch
 	ps = push
 	push-notes = push origin refs/notes/*
@@ -77,6 +85,7 @@
 	ln = oneline
 	tree = oneline --graph
 	last = log -1 HEAD
+	lastp = last -p
 	inicommit = ! git init && git add -A && git commit -m \"init\"
 [includeIf "gitdir:~/Projects/Univ/"]
 	path = ~/Projects/Univ/.gitconfig
