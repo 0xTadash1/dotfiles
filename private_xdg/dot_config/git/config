@@ -12,7 +12,7 @@
 	fetch = +refs/notes/*:refs/notes/*
 [log]
 	abbrevCommit = true
-	date = format:%Y/%m/%d %T
+	date = iso
 [fetch]
 	prune = true
 [merge]
