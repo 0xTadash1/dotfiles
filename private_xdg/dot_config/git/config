@@ -81,7 +81,7 @@
 	pl = pull
 	mergeff = -c merge.ff=true merge
 	graph = log --graph
-	oneline = log --pretty='format:%Cblue%<|(8)%aN %<(32,trunc)%Cred%s%C(auto)%>>(16,trunc)%d %Cgreen%>(13,trunc)%cr %C(auto)%h'
+	oneline = log --pretty='format:%C(auto)%h %Cgreen%>(14,trunc)%cr %Cblue%<|(8)%aN%Creset %s %C(auto)%d'
 	ln = oneline
 	tree = oneline --graph
 	last = log -1 HEAD
