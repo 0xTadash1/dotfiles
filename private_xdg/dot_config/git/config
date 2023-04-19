@@ -61,10 +61,13 @@
 	dfts = dft --staged
 	dfgs = dfg --staged
 	stats = stat --staged
-	# TODO: Use `restore` instead?
-	unstage = reset HEAD --
+	unstage = restore --staged
+	unstagep = restore --staged -p
+	unstage-all = reset HEAD --
+	reset-remote = ! git reset \"origin/$(git branch --show-current)\"
 	a = add
 	A = add -A
+	adp = add -p
 	c = commit
 	ca = commit -a
 	cm = commit -m
@@ -84,6 +87,7 @@
 	oneline = log --pretty='format:%C(auto)%h %Cgreen%>(14,trunc)%cr %Cblue%<|(8)%aN%Creset %s %C(auto)%d'
 	ln = oneline
 	tree = oneline --graph
+	logp = log -p
 	last = log -1 HEAD
 	lastp = last -p
 	inicommit = ! git init && git add -A && git commit -m \"init\"
