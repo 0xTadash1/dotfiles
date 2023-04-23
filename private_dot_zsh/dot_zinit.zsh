@@ -54,10 +54,13 @@ zinit wait'0' lucid light-mode for sbin'translate -> trans' \
 		stdin='[[ -p /dev/stdin ]] && command cat'
 		_e2j='trans -b -s en -t ja'
 		_j2e='trans -b -s ja -t en'
+
 		alias e2j="{ $stdin || $xclip_sed } | $_e2j"
 		alias j2e="{ $stdin || $xclip_sed } | $_j2e"
 		alias e2j2e="{ $stdin || $xclip_sed } | $_e2j >&2 | $_j2e"
 		alias j2e2j="{ $stdin || $xclip_sed } | $_j2e >&2 | $_e2j"
+
+		unset xclip_sed stdin _e2j _j2e
 		END
 		)" \
 		@soimort/translate-shell
