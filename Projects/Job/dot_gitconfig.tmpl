@@ -1,0 +1,8 @@
+[user]
+	name = {{ (bitwardenFields "item" "Projects/Job/.gitconfig").user_name.value }}
+	email = {{ (bitwardenFields "item" "Projects/Job/.gitconfig").user_email.value }}
+[core]
+	sshCommand = "ssh -F $HOME/.ssh/job.conf"
+	autocrlf = false
+	safecrlf = warn
+	quotepath = false

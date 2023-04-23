@@ -1,6 +1,6 @@
 [user]
 	name = 0xTadash1
-	email = 56265995+0xTadash1@users.noreply.github.com
+	email = syfertx4yd.qvk@gmail.com
 [init]
 	defaultBranch = main
 [core]
@@ -93,3 +93,5 @@
 	inicommit = ! git init && git add -A && git commit -m \"init\"
 [includeIf "gitdir:~/Projects/Univ/"]
 	path = ~/Projects/Univ/.gitconfig
+[includeIf "gitdir:~/Projects/Job/"]
+	path = ~/Projects/Job/.gitconfig

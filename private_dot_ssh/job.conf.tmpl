@@ -1,0 +1,13 @@
+Host github.com gist.github.com
+	User            git
+	HostName        %h
+	IdentityFile    ~/.ssh/id_ed25519_github_job
+	TCPKeepAlive    yes
+	IdentitiesOnly  yes
+
+Host {{ (bitwardenFields "item" ".ssh/job.conf").HostNames.value }}
+	User            git
+	HostName        %h
+	IdentityFile    ~/.ssh/id_ed25519_gitlab_job
+	TCPKeepAlive    yes
+	IdentitiesOnly  yes
