@@ -1,6 +1,14 @@
+Host *
+	ControlMaster auto
+	ControlPath ~/.ssh/mux-%r@%h:%p
+	ControlPersist 4h
+
 Host github.com gist.github.com
 	User            git
 	HostName        %h
 	IdentityFile    ~/.ssh/id_ed25519_github
-	TCPKeepAlive    yes
+	#TCPKeepAlive    yes
 	IdentitiesOnly  yes
+	ServerAliveInterval 2m
+	ServerAliveCountMax 2
+

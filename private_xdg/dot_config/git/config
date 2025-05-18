@@ -8,19 +8,24 @@
 	hooksPath = ~/xdg/.config/git/hooks
 	autocrlf = input
 	pager = delta
+	#whitespace = 
 [remote "origin"]
 	fetch = +refs/notes/*:refs/notes/*
+[status]
+	showUntrackedFiles = all
 [log]
 	abbrevCommit = true
 	date = iso
 [fetch]
 	prune = true
 [merge]
-	ff = false
+	#ff = false
 	conflictstyle = zdiff3
 [pull]
-	ff = only
-	rebase = false
+	prune = true
+[push]
+	autoSetupRemote = true
+	followTags = true
 [rebase]
 	autoStash = true
 	autoSquash = true
@@ -49,8 +54,8 @@
 	# `curl -o "$XDG_CONFIG_HOME/git/tokyonight_night.gitconfig" 'https://raw.githubusercontent.com/folke/tokyonight.nvim/main/extras/delta/tokyonight_night.gitconfig'`
 	path = tokyonight_night.gitconfig
 [alias]
-	s = status --short --untracked-files
-	st = status
+	s = status --short
+	st = status #--branch
 	df = diff
 	dfx = -c delta.side-by-side=true diff
 	dft = difftool
@@ -66,7 +71,7 @@
 	unstage-all = reset HEAD --
 	reset-remote = ! git reset \"origin/$(git branch --show-current)\"
 	a = add
-	A = add -A
+	aa = add -A
 	adp = add -p
 	c = commit
 	ca = commit -a
@@ -76,17 +81,23 @@
 	aamend = commit -a --amend
 	ck = checkout
 	br = branch
+	bvv = branch -vv
 	bra = branch -a
 	brr = branch -r
 	sw = switch
+	sw- = switch -
+	swc = switch -c
 	ps = push
+	psf = push --force-with-lease
 	push-notes = push origin refs/notes/*
 	pl = pull
 	mergeff = -c merge.ff=true merge
+	l = ! git log --oneline main.. || git log --oneline master..
 	graph = log --graph
 	oneline = log --pretty='format:%C(auto)%h %Cgreen%>(14,trunc)%cr %Cblue%<|(8)%aN%Creset %s %C(auto)%d'
 	ln = oneline
 	tree = oneline --graph
+	lp = log -p
 	logp = log -p
 	last = log -1 HEAD
 	lastp = last -p

@@ -1,0 +1,57 @@
+[general]
+framerate = 120
+
+# 'autosens' will attempt to decrease sensitivity if the bars peak. 1 = on, 0 = off
+autosens = 0
+
+# Manual sensitivity in %. If autosens is enabled, this will only be the initial value.
+# 200 means double height. Accepts only non-negative values.
+; sensitivity = 80
+
+# The number of bars (0-200). 0 sets it to auto (fill up console).
+# Bars' width and space between bars in number of characters.
+; bars = 24
+bar_width = 1
+bar_spacing = 2
+
+# Seconds with no input before cava goes to sleep mode. Cava will not perform FFT or drawing and
+# only check for input once per second. Cava will wake up once input is detected. 0 = disable.
+sleep_timer = 30
+
+
+[output]
+# Visual channels. Can be 'stereo' or 'mono'.
+# 'stereo' mirrors both channels with low frequencies in center.
+# 'mono' outputs left to right lowest to highest frequencies.
+# 'mono_option' set mono to either take input from 'left', 'right' or 'average'.
+# set 'reverse' to 1 to display frequencies the other way around.
+; channels = stereo
+; mono_option = average
+; reverse = 0
+
+
+[color]
+; background = default
+; foreground = default
+
+# You can define as many as 8 different colors. They range from bottom to top of screen
+gradient = 1
+gradient_count = 4
+gradient_color_1 = '#2ac3de'
+gradient_color_2 = '#7aa2f7'
+gradient_color_3 = '#bb9af7'
+gradient_color_4 = '#f7768e'
+
+[smoothing]
+monstercat = 1
+
+
+[eq]
+# This one is tricky. You can have as much keys as you want.
+# Remember to uncomment more then one key! More keys = more precision.
+# Look at readme.md on github for further explanations and examples.
+; 1 = .4 # bass
+; 2 = .7
+; 3 = 1 # midtone
+; 4 = 1.3
+; 5 = 1.6 # treble
