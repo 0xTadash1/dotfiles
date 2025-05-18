@@ -51,7 +51,13 @@ zinit wait lucid light-mode for @0xTadash1/util.sh
 zinit wait lucid light-mode for @0xTadash1/dirstax
 zinit wait lucid light-mode for \
 	as'null' \
-	atload'smartcache eval source ./gxx.sh' \
+	atload'
+		smartcache eval source ./gxx.sh
+		alias g-="git switch -"
+		alias g..="git log main.."
+		alias g...="git log main..."
+		alias g1="g oneline"
+	' \
 	@0xTadash1/gxx.sh
 
 zinit wait lucid light-mode for \
@@ -131,7 +137,7 @@ zinit wait lucid for \
 		@zdharma-continuum/fast-syntax-highlighting \
 	blockf atpull'zinit creinstall -q .' \
 		@zsh-users/zsh-completions \
-	has'fzf' if'[[ ! true ]]' atload'
+	has'fzf' atload'
 		zstyle ":completion:*:git-checkout:*" sort false
 		zstyle ":completion:*:descriptions" format "[%d]"
 		zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"
