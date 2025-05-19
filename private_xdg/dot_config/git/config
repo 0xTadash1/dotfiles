@@ -9,6 +9,8 @@
 	autocrlf = input
 	pager = delta
 	#whitespace = 
+	fsmonitor = true
+	untrackedCache = true
 [remote "origin"]
 	fetch = +refs/notes/*:refs/notes/*
 [status]
@@ -18,22 +20,38 @@
 	date = iso
 [fetch]
 	prune = true
+	pruneTags = true
+	all = true
 [merge]
-	#ff = false
 	conflictstyle = zdiff3
 [pull]
 	prune = true
+	#rebase = true
 [push]
 	autoSetupRemote = true
 	followTags = true
+[tag]
+	sort = version:refname
+[branch]
+	sort = -committerdate
+[commit]
+	verbose = true
+[rerere]
+	enabled = true
 [rebase]
 	autoStash = true
 	autoSquash = true
+[help]
+	autocorrect = prompt
+[column]
+	ui = auto
 [interactive]
 	diffFilter = delta --color-only
 [diff]
-	colorMoved = default
+	colorMoved = dimmed-zebra
 	algorithm = histogram
+	mnemonicPrefix = true
+	renames = copies
 	# TODO: Use neovim instead?
 	tool = kitty
 	guitool = kitty.gui

@@ -45,7 +45,8 @@ zinit wait lucid light-mode for \
 	atload'zstyle ":prezto:module:terminal" auto-title "yes"' \
 	PZTM::terminal
 
-zinit wait lucid light-mode for proto'ssh' @0xTadash1/zsh-noob-init
+#zinit wait lucid light-mode for proto'ssh' @0xTadash1/zsh-noob-init
+zinit wait lucid light-mode for @0xTadash1/rc
 zinit wait lucid light-mode for @0xTadash1/util.sh
 
 zinit wait lucid light-mode for @0xTadash1/dirstax
