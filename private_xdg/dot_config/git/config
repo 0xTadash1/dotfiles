@@ -110,7 +110,7 @@
 	push-notes = push origin refs/notes/*
 	pl = pull
 	mergeff = -c merge.ff=true merge
-	l = ! git log --oneline main.. || git log --oneline master..
+	l = log
 	graph = log --graph
 	oneline = log --pretty='format:%C(auto)%h %Cgreen%>(14,trunc)%cr %Cblue%<|(8)%aN%Creset %s %C(auto)%d'
 	ln = oneline
