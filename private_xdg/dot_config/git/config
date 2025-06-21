@@ -8,8 +8,10 @@
 	hooksPath = ~/xdg/.config/git/hooks
 	autocrlf = input
 	pager = delta
-	#whitespace = 
+	whitespace = warn,trailing-space,space-before-tab,cr-at-eol
 	fsmonitor = true
+	multiPackIndex = true
+	preloadIndex = true
 	untrackedCache = true
 [remote "origin"]
 	fetch = +refs/notes/*:refs/notes/*
@@ -41,6 +43,7 @@
 [rebase]
 	autoStash = true
 	autoSquash = true
+	updateRefs = true
 [help]
 	autocorrect = prompt
 [column]
@@ -72,6 +75,7 @@
 	# `curl -o "$XDG_CONFIG_HOME/git/tokyonight_night.gitconfig" 'https://raw.githubusercontent.com/folke/tokyonight.nvim/main/extras/delta/tokyonight_night.gitconfig'`
 	path = tokyonight_night.gitconfig
 [alias]
+	clone = clone --filter=blob:none
 	s = status --short
 	st = status #--branch
 	df = diff
@@ -90,7 +94,7 @@
 	reset-remote = ! git reset \"origin/$(git branch --show-current)\"
 	a = add
 	aa = add -A
-	adp = add -p
+	ap = add -p
 	c = commit
 	ca = commit -a
 	cm = commit -m
@@ -98,10 +102,10 @@
 	amend = commit --amend
 	aamend = commit -a --amend
 	ck = checkout
-	br = branch
+	b = branch
+	ba = branch -a
+	br = branch -r
 	bvv = branch -vv
-	bra = branch -a
-	brr = branch -r
 	sw = switch
 	sw- = switch -
 	swc = switch -c
@@ -119,7 +123,12 @@
 	logp = log -p
 	last = log -1 HEAD
 	lastp = last -p
+	log-branch = log main..
+	lb = log-branch
 	inicommit = ! git init && git add -A && git commit -m \"init\"
+	delete-gone-branch = ! git branch -vv | awk '/: gone]/ {print $1}' | xargs -r git branch -d
+	main-as-master = symbolic-ref refs/heads/main refs/heads/master
+	unset-main-as-master = update-ref -d refs/heads/main
 [includeIf "gitdir:~/Projects/Univ/"]
 	path = ~/Projects/Univ/.gitconfig
 [includeIf "gitdir:~/Projects/Job/"]
