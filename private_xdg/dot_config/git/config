@@ -129,7 +129,7 @@
 	delete-gone-branch = ! git branch -vv | awk '/: gone]/ {print $1}' | xargs -r git branch -d
 	delete-gone-branch-force = ! git branch -vv | awk '/: gone]/ {print $1}' | xargs -r git branch -D
 	main-as-master = symbolic-ref refs/heads/main refs/heads/master
-	unset-main-as-master = update-ref -d refs/heads/main
+	unset-main-as-master = ! git symbolic-ref -q refs/heads/main && git update-ref -d refs/heads/main
 [includeIf "gitdir:~/Projects/Univ/"]
 	path = ~/Projects/Univ/.gitconfig
 [includeIf "gitdir:~/Projects/Job/"]
