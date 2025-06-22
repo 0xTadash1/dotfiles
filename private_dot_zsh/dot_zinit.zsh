@@ -239,11 +239,15 @@ zinit wait lucid light-mode for id-as'setup-lscolors' as'null' has'vivid' \
 	@zdharma-continuum/null
 
 zinit wait lucid light-mode for sbin'zoxide' from'gh-r' bpick'*x86_64-unknown-linux*' nocompile \
+	if'[[ "$(uname -s)" != "Darwin" ]]' \
 	atclone'command cp -Rv ./man/. "${ZINIT[MAN_DIR]}"' \
 	atpull'%atclone' \
 	atload'smartcache eval zoxide init zsh' \
 	@ajeetdsouza/zoxide
 
+#zinit wait lucid light-mode for id-as'setup-zoxide' as'null' has'zoxide' \
+#	atload'smartcache eval zoxide init zsh' \
+#	@zdharma-continuum/null
 
 zinit wait lucid light-mode for \
 	id-as'setup-fzf' as'null' has'fzf' \
