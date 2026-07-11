@@ -1,0 +1,7 @@
+[general]
+language = "ja-JP"
+
+[aur]
+shellcheck = true
+delmakedeps = true
+clean = true
