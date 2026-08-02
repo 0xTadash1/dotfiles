@@ -1,0 +1,31 @@
+#!/bin/sh
+#
+# xclip の最小スタブ。
+#
+# X が無いコンテナで、クリップボード経路を決定的に検証するために置く。
+# 検証したいのは以下 2 つで、どちらも xclip の存在を前提にしている。
+#   - .zinit.zsh の if'[[ ! -z "$(command -v pbcopy xclip xsel wl-copy)" ]]' ガード
+#     が通った側で @kutsan/zsh-system-clipboard がロードされること
+#   - OMZL::clipboard.zsh の clipcopy / clippaste が機能すること ($DISPLAY も要る)
+#
+# 実物の xclip を入れても X サーバが無いので実行時に失敗し、ガードが効いた
+# 状態より紛らわしくなる。スタブなら経路だけを決定的に通せる。
+#
+# xclip 互換層を作るのが目的ではないので、selection の区別も引数の検証もしない。
+# 検証対象は dotfiles 側の 2 経路だけで、xclip の CLI 仕様はこの repo の
+# 責務ではない。読み出しは -o / -out が付いたときだけ (xclip の既定は -in)。
+
+store="${XCLIP_STUB_FILE:-${TMPDIR:-/tmp}/xclip-stub-clipboard}"
+
+for arg in "$@"; do
+	case "$arg" in
+		-o|-out|-output)
+			if [ -f "$store" ]; then
+				exec cat "$store"
+			fi
+			exit 0
+			;;
+	esac
+done
+
+cat > "$store"

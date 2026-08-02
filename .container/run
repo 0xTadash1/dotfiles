@@ -1,0 +1,235 @@
+#!/usr/bin/env zsh
+#
+# dotfiles 検証コンテナのビルドと実行。
+#
+#   .container/run build [minimal|full]              イメージをビルドする
+#   .container/run sh    [minimal|full]              対話シェルに入る
+#   .container/run test  [minimal|full] [warm|cold]  非対話テストを走らせる
+#   .container/run clean [minimal|full]              プラグインキャッシュを捨てる
+#
+# variant を省略すると full。
+#
+# test のモード:
+#   warm (既定) プラグインキャッシュを再利用する。速い。
+#   cold        キャッシュを捨ててから走らせる。新規マシンの初回起動に相当。
+#
+# プラグインは revision 固定ではなく上流の HEAD を追うので、結果はネットワークと
+# 上流更新に依存する。cold で失敗する変更が warm では通り得るため、どちらで
+# 走らせたかを結果に明示する。設定側の意図 (上流追従) を変えたくないので、
+# revision の固定はしない。代わりに解決された revision をテスト出力に記録する。
+#
+# 環境変数:
+#   ENGINE      podman / docker (既定は podman があれば podman)
+#   PLATFORM    既定はホストの arch に合わせる
+#   BASE_IMAGE  既定は PLATFORM から決める
+#   WALK_ARCH   walk のリリース資産の arch (既定は PLATFORM から決める)
+#   WALK_SHA256 walk バイナリの checksum (既定は arch から決める)
+#   IMAGE       イメージ名の接頭辞 (既定 dotfiles-verify)
+#   PTY_TERM    test 時にセッションへ渡す TERM (既定 linux = p10k をスキップ)
+
+emulate -L zsh
+setopt err_exit no_unset pipe_fail
+
+typeset HERE=${0:A:h}
+typeset REPO=${HERE:h}
+
+if [[ -z ${ENGINE-} ]]; then
+	if command -v podman >/dev/null 2>&1; then
+		ENGINE=podman
+	else
+		ENGINE=docker
+	fi
+fi
+
+# walk のリリース資産の checksum。version はタグを差し替えられるので、それだけ
+# では取得物の同一性を確認できない。Dockerfile の WALK_VERSION に対応する値で、
+# 上げるときは両方を揃える。揃っていなければビルドが sha256sum -c で落ちる。
+typeset WALK_SHA256_AMD64=7c3b6e28fd0eee20170a07be5ceae001e466d8948b32feb005c447f4cf7c3c21
+typeset WALK_SHA256_ARM64=42664c11d54d1e7f7ca5131c34197de120f03d535238d6cadbe03bba8303ebc8
+
+# ホストの arch に合わせてネイティブで動かす。amd64 をエミュレーションで
+# 動かすことはできない: qemu-user 下では Arch の zsh が外部コマンドを
+# fork した時点でハングする。
+#
+# 公式 archlinux イメージは amd64 のみなので、arm64 では非公式の
+# multi-arch リビルドを使う。x86_64 の実機では公式イメージのまま。
+case ${PLATFORM-} in
+	'')
+		case $(uname -m) in
+			arm64|aarch64)
+				PLATFORM=linux/arm64
+				: ${BASE_IMAGE:=docker.io/lopsided/archlinux:latest}
+				: ${WALK_ARCH:=arm64}
+				: ${WALK_SHA256:=$WALK_SHA256_ARM64}
+				;;
+			*)
+				PLATFORM=linux/amd64
+				: ${BASE_IMAGE:=docker.io/library/archlinux:base}
+				: ${WALK_ARCH:=amd64}
+				: ${WALK_SHA256:=$WALK_SHA256_AMD64}
+				;;
+		esac
+		;;
+	linux/arm64)
+		: ${BASE_IMAGE:=docker.io/lopsided/archlinux:latest}
+		: ${WALK_ARCH:=arm64}
+		: ${WALK_SHA256:=$WALK_SHA256_ARM64}
+		;;
+	*)
+		: ${BASE_IMAGE:=docker.io/library/archlinux:base}
+		: ${WALK_ARCH:=amd64}
+		: ${WALK_SHA256:=$WALK_SHA256_AMD64}
+		;;
+esac
+
+: ${IMAGE:=dotfiles-verify}
+
+# プラグインが入る環境の指紋。Dockerfile とビルド引数から計算する。
+# named volume に書き込んだ値と食い違ったら entrypoint が止める。
+sha256_of_stdin() {
+	if command -v sha256sum >/dev/null 2>&1; then
+		sha256sum | awk '{print $1}'
+	else
+		shasum -a 256 | awk '{print $1}'
+	fi
+}
+
+image_stamp() {
+	{
+		print -r -- "$BASE_IMAGE"
+		print -r -- "$WALK_ARCH"
+		print -r -- "$WALK_SHA256"
+		cat "$HERE/Dockerfile"
+	} | sha256_of_stdin
+}
+
+usage() {
+	print -ru2 -- "usage: ${0:t} {build|sh|test|clean} [minimal|full] [warm|cold]"
+	exit 2
+}
+
+(( $# >= 1 )) || usage
+
+typeset action=$1
+typeset variant=${2:-full}
+typeset mode=${3:-warm}
+
+case $variant in
+	minimal|full) ;;
+	*) print -ru2 -- "不明な variant: $variant"; usage ;;
+esac
+
+case $mode in
+	warm|cold) ;;
+	*) print -ru2 -- "不明なモード: $mode"; usage ;;
+esac
+
+typeset image="${IMAGE}:${variant}"
+typeset vol_zinit="${IMAGE}-${variant}-zinit"
+typeset vol_cache="${IMAGE}-${variant}-cache"
+
+# repo は read-only。コンテナ側は entrypoint が $HOME にコピーする。
+# プラグインは named volume に残すので、2 回目以降の起動が速い。
+typeset -a run_args=(
+	--rm
+	--platform "$PLATFORM"
+	--volume "${REPO}:/mnt/dotfiles:ro"
+	--volume "${vol_zinit}:/home/dev/.zsh/.zinit"
+	--volume "${vol_cache}:/home/dev/.cache"
+	# SELinux のラベリングを切る。
+	#
+	# p10k は gitstatusd を ~/.cache に取ってきて tar で展開する。その際
+	# アーカイブ内の SELinux ラベルまで復元されるうえ、podman は起動ごとに
+	# 別の MCS カテゴリを割り当てる。結果、あるコンテナが書いたバイナリは
+	# 次のコンテナから読めず、起動ごとに gitstatus の初期化が失敗する。
+	#
+	# 同一コンテナ内では読めるので、テスト (1 回の run で完結) では気付けない。
+	# run sh を 2 回叩くと毎回エラーが出る、という形で現れる。
+	# :z (マウント時の再ラベル) では直らない。ラベルが付くのは tar の後だから。
+	#
+	# repo を read-only で渡すだけの使い捨てコンテナなので、隔離を弱めるより
+	# 実機と同じ起動経路を再現できることを取る。
+	--security-opt label=disable
+)
+
+case $action in
+	build)
+		# ビルドコンテキストは .container/ のみ。repo 本体はイメージに入れない。
+		$ENGINE build \
+			--platform "$PLATFORM" \
+			--target "$variant" \
+			--build-arg "BASE_IMAGE=$BASE_IMAGE" \
+			--build-arg "WALK_ARCH=$WALK_ARCH" \
+			--build-arg "WALK_SHA256=$WALK_SHA256" \
+			--build-arg "IMAGE_STAMP=$(image_stamp)" \
+			--tag "$image" \
+			"$HERE"
+		;;
+	sh)
+		# ホスト側の terminfo 定義をそのまま渡す。コンテナが知らない TERM なら
+		# entrypoint が取り込む。焼き込まない理由と、無いとどう壊れるかは
+		# resolve-term.zsh の冒頭にある。
+		typeset host_terminfo=
+		if [[ -n ${TERM-} ]] && command -v infocmp >/dev/null 2>&1; then
+			host_terminfo=$(infocmp -x "$TERM" 2>/dev/null) || host_terminfo=
+		fi
+		# ホストが macOS なら dirstax を ⌘ + 矢印にする。コンテナは Linux
+		# なので dirstax の既定は alt 側だが、Mac で使うときは ⌘ の方が
+		# 指に馴染む。test では渡さない (設定そのままの姿を検証するため)。
+		typeset -a sh_env=(
+			--env "TERM=${TERM:-xterm-256color}"
+			--env "HOST_TERMINFO=$host_terminfo"
+		)
+		# truecolor は terminfo (Tc / setrgbf) だけでなく $COLORTERM でも
+		# 判定されるので渡す。p10k や bat はこちらを見る。空で渡すと
+		# 「設定済みだが空」と解釈する実装があるため、非空のときだけ。
+		#
+		# test では渡さない。ホストの端末に結果が左右されると再現しない。
+		# && で書くと、COLORTERM が無いホストでリスト全体が非 0 になり
+		# err_exit でスクリプトが黙って終わる。
+		if [[ -n ${COLORTERM-} ]]; then
+			sh_env+=(--env "COLORTERM=$COLORTERM")
+		fi
+		if [[ $(uname -s) == Darwin ]]; then
+			sh_env+=(--env 'DIRSTAX_KEYBINDS=darwin')
+		fi
+		$ENGINE run -it "${run_args[@]}" "${sh_env[@]}" "$image"
+		;;
+	test)
+		# -t は進行を逐次見るために付ける (無いと出力がブロックバッファされ、
+		# ハングしたときに何も分からない)。テスト対象の疑似端末はこれとは別に
+		# zpty が張るので、-t の有無はセッションの対話性に影響しない。
+		if [[ $mode == cold ]]; then
+			# 削除の失敗を握りつぶすと、warm のまま cold として結果を出して
+			# しまう。消えたことを確認してから進む。
+			$ENGINE volume rm --force "$vol_zinit" "$vol_cache" >/dev/null 2>&1 || true
+			typeset -a left=()
+			typeset v
+			for v in "$vol_zinit" "$vol_cache"; do
+				# && で書くと、volume が無いとき (= 正常) にリスト全体が
+				# 非 0 になり err_exit でスクリプトが落ちる。
+				if $ENGINE volume inspect "$v" >/dev/null 2>&1; then
+					left+=("$v")
+				fi
+			done
+			if (( ${#left} )); then
+				print -ru2 -- "cold にできない。volume が残っている: ${(j:, :)left}"
+				print -ru2 -- "使用中のコンテナが無いか確認すること。"
+				exit 1
+			fi
+		fi
+		# TEST_VARIANT はテスト側が期待値の根拠にする。実測したコマンドの
+		# 有無で分岐させると、イメージ側の欠落に適応して green になる。
+		$ENGINE run -t "${run_args[@]}" \
+			--env "TEST_VARIANT=$variant" \
+			--env "TEST_MODE=$mode" \
+			--env "PTY_TERM=${PTY_TERM:-linux}" \
+			"$image" test
+		;;
+	clean)
+		$ENGINE volume rm --force "$vol_zinit" "$vol_cache"
+		;;
+	*)
+		usage
+		;;
+esac
