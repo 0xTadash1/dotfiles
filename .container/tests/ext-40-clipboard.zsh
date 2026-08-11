@@ -5,8 +5,9 @@
 # 通った側を検証する。既定の PTY セッションはクリップボードツールを一切
 # 持たないので、PATH にスタブを載せた別セッションで走らせる (ext 群)。
 #
-# 検証するのは dotfiles が使う 2 経路 (zsh-system-clipboard と OMZ の
-# clipcopy/clippaste) だけ。スタブ自身の CLI 仕様はこの repo の責務ではない。
+# 検証するのは dotfiles が使う 3 経路だけ。zsh-system-clipboard、OMZ の
+# clipcopy/clippaste、そこから読む trans.stdin。スタブ自身の CLI 仕様は
+# この repo の責務ではない。
 #
 # 書き込みと読み出しは別の assertion にする。1 つのコマンド列にまとめると
 # assert_output が見るのは最後のコマンドの終了コードだけになり、書き込み側の
@@ -49,17 +50,15 @@ assert_output "clippaste が同じ内容を返す (clipcopy は非同期)" \
 ##
 # クリップボードから読む経路
 #
-# e2j / j2e はパイプが無いときクリップボードから入力を取る。その経路が
-# 生きているかを、公開コマンド経由で確認する。
-#
-# trans を PATH に持たないセッションなので e2j の末尾は失敗するが、
-# 見たいのは「クリップボードの内容が入力として取れるか」なので、
-# clippaste の結果で確認する。整形と翻訳コマンドへの受け渡しは trans-60 が見る。
+# e2j / j2e はパイプが無いときクリップボードから入力を取る。その分岐を担うのは
+# trans.stdin なので、それを直接呼ぶ。e2j 自体は呼ばない。trans を PATH に
+# 持たないセッションなので末尾が必ず失敗し、どこで落ちたか言えなくなる。
 #
 
-assert_cond "e2j の入力元になる内容を clipcopy できる" \
-	'print -r -- from-clipboard | clipcopy'
+pty_run 'print -r -- from-clipboard | clipcopy' \
+	|| fatal "trans.stdin の入力を用意できなかった"
 
-assert_output "clippaste でその内容が取れる" \
-	'repeat 300 { [[ "$(clippaste 2>/dev/null)" == from-clipboard ]] && break; sleep 0.1 }; clippaste' \
+# clipcopy は書き込みを非同期で走らせるので、完了を待ってから読む。
+assert_output "パイプが無いとき trans.stdin がクリップボードから読む" \
+	'repeat 300 { [[ "$(clippaste 2>/dev/null)" == from-clipboard ]] && break; sleep 0.1 }; trans.stdin' \
 	'from-clipboard'

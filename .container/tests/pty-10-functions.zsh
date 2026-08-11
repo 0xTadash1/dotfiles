@@ -119,13 +119,11 @@ fi
 assert_cond "Linux では z コマンドが使える" \
 	'(( ${+functions[z]} && ${+functions[zi]} ))'
 
+# 実際に z で移動してみることはしない。__zoxide_z は引数が既存ディレクトリなら
+# builtin cd に短絡してバイナリを呼ばないので、cd の確認にしかならない。
+# バイナリが動くことを直接見る。検索そのものは zoxide 側の責務。
 assert_cond "zoxide のバイナリが実行できる" \
 	'zoxide --version >/dev/null'
-
-# 存在だけでなく、実際にディレクトリが動くことを見る。
-assert_output "z で移動できる" \
-	'cd /usr; z /tmp >/dev/null 2>&1; print -r -- $PWD' \
-	'/tmp'
 
 ##
 # 補完系
@@ -143,14 +141,19 @@ assert_cond "zinit の補完が登録される" \
 # しない。
 #
 
+# 次の 2 件は対で意味を持つ。HIST_IGNORE_DUPS は OMZ も立てるので、有効なだけ
+# では「rc が後から立て直した」と「.zinit.zsh の unsetopt が走らなかった」を
+# 区別できない。rc が触らない HIST_VERIFY が無効であることが unsetopt の実行を
+# 確定させ、そのうえで HIST_IGNORE_DUPS が有効なら rc が勝ったことになる。
+# 片方だけ消すと残った側が何も言わなくなる。
 assert_cond "rc が決めた HIST_IGNORE_DUPS が最終状態として有効" \
 	'[[ -o hist_ignore_dups ]]'
 
 assert_cond "HIST_VERIFY は最終状態として無効" \
 	'[[ ! -o hist_verify ]]'
 
+# HIST_FCNTL_LOCK を立てるのは rc だけ。この 1 件だけが @0xTadash1/rc の
+# ロードそのものを確認している。rc の他のオプション (HIST_SAVE_NO_DUPS など) を
+# 並べても同じ 1 つの失敗を重ねて見るだけなので足さない。
 assert_cond "rc の HIST_FCNTL_LOCK が有効" \
 	'[[ -o hist_fcntl_lock ]]'
-
-assert_cond "rc の HIST_SAVE_NO_DUPS が有効" \
-	'[[ -o hist_save_no_dups ]]'

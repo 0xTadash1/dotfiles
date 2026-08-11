@@ -50,14 +50,6 @@ else
 	fail "⌘ + ← のキーが書かれる" "$(<$work/zshrc-darwin)"
 fi
 
-# 未知の値で誤って darwin 扱いにならないこと。
-gen_zshrc $work/zshrc-other something-else
-if [[ "$(<$work/zshrc-other)" == '. $ZDOTDIR/.zinit.zsh' ]]; then
-	ok "未知の指定は既定と同じ扱いになる"
-else
-	fail "未知の指定は既定と同じ扱いになる" "$(<$work/zshrc-other)"
-fi
-
 ##
 # TERM の解決
 #

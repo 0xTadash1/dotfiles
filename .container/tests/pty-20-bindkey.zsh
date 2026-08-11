@@ -102,10 +102,12 @@ assert_output "alt + → が dirstax-cd-forward" \
 assert_output "alt + ↑ が dirstax-cd-upward" \
 	"bindkey '^[[1;3A'" '"^[[1;3A" dirstax-cd-upward'
 
-# dirstax が前提として立てるオプション。これが無いと履歴が積まれない。
-assert_cond "dirstax が AUTO_PUSHD を立てる" \
-	'[[ -o auto_pushd ]]'
-
+# dirstax は前提として AUTO_PUSHD と NO_PUSHD_IGNORE_DUPS を立てる。これが
+# 無いと履歴が積まれない。
+#
+# 見るのは後者だけにする。AUTO_PUSHD は rc も立てるので、有効でも dirstax が
+# ロードされた根拠にならない。PUSHD_IGNORE_DUPS は rc が立てたものを dirstax が
+# 落とすので、ロードと順序の両方を確定できる。
 assert_cond "dirstax が PUSHD_IGNORE_DUPS を落とす" \
 	'[[ ! -o pushd_ignore_dups ]]'
 
