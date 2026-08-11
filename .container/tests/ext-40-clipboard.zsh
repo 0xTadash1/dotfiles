@@ -14,9 +14,12 @@
 # 失敗が隠れる。
 #
 
-assert_output "xclip がスタブを指している" \
-	'command -v xclip' \
-	'/usr/local/lib/dotfiles/stubs/ext/xclip'
+# PATH の差し替えはランナー側の下準備なので assertion には数えない。崩れて
+# いれば以下は全部落ちるが、原因が分かるように先に見ておく。
+pty_run 'command -v xclip' \
+	|| fatal "セッションから xclip の位置を確認できなかった"
+[[ $REPLY == /usr/local/lib/dotfiles/stubs/ext/xclip ]] \
+	|| fatal "xclip がスタブを指していない: $REPLY"
 
 ##
 # @kutsan/zsh-system-clipboard

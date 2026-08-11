@@ -40,9 +40,8 @@ pty_run "command mkdir -p /tmp/gsrepo >/dev/null && cd /tmp/gsrepo && git init -
 	|| fatal "vcs セグメント検証用の git リポジトリを作れなかった"
 
 if [[ $REPLY != ready ]]; then
-	fail "vcs セグメント検証用の git リポジトリを作れる" "$REPLY"
+	fatal "vcs セグメント検証用の git リポジトリを作れなかった: $REPLY"
 else
-	ok "vcs セグメント検証用の git リポジトリを作れる"
 	assert_output_contains "プロンプトに git のブランチ名が出る" \
 		'print -rP -- "$PROMPT"' \
 		$branch
