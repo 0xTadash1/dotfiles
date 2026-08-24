@@ -226,15 +226,10 @@ tarball だけ落ちて展開されていない zoxide が残り続けたこと�
   いう通しの確認は入っていない。
 - **`run sh` の色の見え方:** terminfo の取り込みは `pre-20` が見ているが、
   `TERM` と `COLORTERM` の受け渡しは検証していない。
-- **Darwin 分岐のテスト:** `.zinit.zsh` と dirstax は `uname -s` で macOS 用の
-  キーバインドに分かれるが、実機の Arch も x86_64 のコンテナも Linux なのでその枝は
-  実行されない。この dotfiles の対象環境ではないため、意図的に検証していない。
+- **Darwin 分岐のテスト:** dirstax は `uname -s` で macOS 用のキーバインドに分かれ、
+  `.zinit.zsh` は zoxide のロードを同じ条件で切り替えるが、実機の Arch も x86_64 の
+  コンテナも Linux なのでその枝は実行されない。この dotfiles の対象環境ではないため、意図的に検証していない。
   検証するなら `uname` のスタブを載せた群を足せば届く。
-- **walk のキー割り当て:** `run sh` は macOS ホストのとき dirstax を ⌘ + 矢印に
-  移すが、`lk` を起動する `walk-lk-widget` は alt + ↓ のまま残る。dirstax は
-  連想配列で上書きできる一方、`.zinit.zsh` は walk のキーを `uname -s` の分岐で
-  `bindkey` に直接渡しており、上書きの入口が無い。設定側の不足なのでコンテナでは
-  埋めない。
 - **chezmoi との照合:** 実物の `chezmoi apply` と突き合わせれば配置の検証は完全に
   なるが、「chezmoi を持ち込まない」前提を崩す。代わりに `pre-10` が期待値を直書き
   して突き合わせている。
