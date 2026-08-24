@@ -1,3 +1,4 @@
+# Source this from .zshrc
 typeset -Ax ZINIT=(
 	# [HOME_DIR]="${XDG_DATA_HOME:-$HOME/.local/share}/zinit"
 	[HOME_DIR]="${ZDOTDIR:-$HOME}/.zinit"
@@ -30,7 +31,7 @@ zinit light-mode for \
 	@romkatv/zsh-defer \
 	@QuarticCat/zsh-smartcache
 
-# Practical Settings
+# Base Layer. Practical Settings
 # https://github.com/ohmyzsh/ohmyzsh
 zinit light-mode for \
 	OMZL::completion.zsh \
@@ -102,8 +103,8 @@ zinit wait lucid light-mode for ver'develop' sbin'translate -> trans' \
 		#   A standard hyphen entered via keyboard is "hyphen-minus"
 		trans.stdin() { [[ -p /dev/stdin ]] && command cat || clippaste; }
 		trans.join_and_trim() { tr -d '\n' | tr -s '[:space:]' | sed "s/$(printf '\u2010') //g"; }
-		trans.e2j() { trans -b -s en -t ja; }
-		trans.j2e() { trans -b -s ja -t en; }
+		trans.e2j() { command trans -b -s en -t ja; }
+		trans.j2e() { command trans -b -s ja -t en; }
 
 		e2j() { trans.stdin | trans.join_and_trim | trans.e2j; }
 		j2e() { trans.stdin | trans.join_and_trim | trans.j2e; }
@@ -223,11 +224,13 @@ zinit wait lucid light-mode for id-as'setup-walk' as'null' has'walk' \
 			zle accept-line
 		}
 		zle -N walk-lk-widget
-		if [[ "$(uname -s)" == "Darwin" ]]; then
-			bindkey "^[[1;9B" walk-lk-widget  # ⌘ + ↓
-		else
-			bindkey "^[[1;3B" walk-lk-widget  # alt + ↓
-		fi
+		# Injection point for tests and overrides
+		typeset -ga lk_keybinds
+		(( ${#lk_keybinds} )) || lk_keybinds=(
+			"^[[1;9B"  # ⌘ + ↓
+			"^[[1;3B"  # alt + ↓
+		)
+		for k in "${lk_keybinds[@]}"; do bindkey "$k" walk-lk-widget; done
 	' \
 	@zdharma-continuum/null
 
