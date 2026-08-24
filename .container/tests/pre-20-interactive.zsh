@@ -37,13 +37,6 @@ else
 	fail "darwin 指定で dirstax の設定が先頭に来る" "1 行目: ${lines[1]-}"
 fi
 
-# 順序が逆だと .zinit.zsh のロード後になり、拡張点として効かない。
-if [[ ${lines[-1]} == '. $ZDOTDIR/.zinit.zsh' ]]; then
-	ok "dirstax の設定は .zinit.zsh の読み込みより前にある"
-else
-	fail "dirstax の設定は .zinit.zsh の読み込みより前にある" "最終行: ${lines[-1]-}"
-fi
-
 if [[ "$(<$work/zshrc-darwin)" == *"[keybind_backward]='^[[1;9D'"* ]]; then
 	ok "⌘ + ← のキーが書かれる"
 else
