@@ -5,6 +5,9 @@
 # widget が期待どおり動くかは検証していない。同名の widget の中身が壊れても
 # このファイルは green になる。
 #
+# プラグインマネージャの移行では widget 名が変わらないので、この群は移行後も
+# 黙って通り続ける。撤去の検討は移行完了時に行うこと。
+#
 # S はクォートする。rc がグローバル alias S='| sed' を張っており、裸で書くと
 # bindkey -M visual | sed に展開されて sed の usage が返る。同様に
 # A G H HD L LP N P R TL V X X0 も張られているので、テストのコマンド内で
@@ -88,19 +91,9 @@ assert_output "検索が smart-case (globbing flag l)" \
 ##
 # dirstax (ディレクトリ履歴の前後移動)
 #
-# プラグイン側が uname -s で分岐して自分でキーを張る。Linux では
-# alt + 矢印、Darwin では ⌘ + 矢印。コンテナは Linux なので alt 側。
-# has ガードが無いので minimal でもロードされる。
+# has ガードが無いので minimal でもロードされる。キーの登録は扱わない。
+# pty-30 が同じ 3 キーを実キーで押して cwd の変化まで見ている。
 #
-
-assert_output "alt + ← が dirstax-cd-backward" \
-	"bindkey '^[[1;3D'" '"^[[1;3D" dirstax-cd-backward'
-
-assert_output "alt + → が dirstax-cd-forward" \
-	"bindkey '^[[1;3C'" '"^[[1;3C" dirstax-cd-forward'
-
-assert_output "alt + ↑ が dirstax-cd-upward" \
-	"bindkey '^[[1;3A'" '"^[[1;3A" dirstax-cd-upward'
 
 # dirstax は前提として AUTO_PUSHD と NO_PUSHD_IGNORE_DUPS を立てる。これが
 # 無いと履歴が積まれない。
@@ -116,7 +109,7 @@ assert_cond "dirstax が PUSHD_IGNORE_DUPS を落とす" \
 ##
 # walk の widget: has'walk' ガードで分岐する
 #
-# バインド先は uname で分かれる。コンテナは Linux なので alt + ↓ の側。
+# キーはプラットフォームで分岐せず、⌘ + ↓ と alt + ↓ の両方を張る。
 #
 
 if (( FULL )); then
@@ -124,8 +117,8 @@ if (( FULL )); then
 		'(( ${+widgets[walk-lk-widget]} ))'
 	assert_output "walk あり: alt + ↓ が walk-lk-widget" \
 		"bindkey '^[[1;3B'" '"^[[1;3B" walk-lk-widget'
-	assert_output "walk あり: Darwin 用の ⌘ + ↓ は張られない" \
-		"bindkey '^[[1;9B'" '"^[[1;9B" undefined-key'
+	assert_output "walk あり: ⌘ + ↓ も walk-lk-widget" \
+		"bindkey '^[[1;9B'" '"^[[1;9B" walk-lk-widget'
 else
 	assert_cond "walk なし: walk-lk-widget が登録されない" \
 		'(( ! ${+widgets[walk-lk-widget]} ))'
