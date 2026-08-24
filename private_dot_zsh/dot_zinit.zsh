@@ -1,3 +1,4 @@
+# Source this from .zshrc
 typeset -Ax ZINIT=(
 	# [HOME_DIR]="${XDG_DATA_HOME:-$HOME/.local/share}/zinit"
 	[HOME_DIR]="${ZDOTDIR:-$HOME}/.zinit"
@@ -30,7 +31,7 @@ zinit light-mode for \
 	@romkatv/zsh-defer \
 	@QuarticCat/zsh-smartcache
 
-# Practical Settings
+# Base Layer. Practical Settings
 # https://github.com/ohmyzsh/ohmyzsh
 zinit light-mode for \
 	OMZL::completion.zsh \
