@@ -224,13 +224,8 @@ zinit wait lucid light-mode for id-as'setup-walk' as'null' has'walk' \
 			zle accept-line
 		}
 		zle -N walk-lk-widget
-		# Injection point for tests and overrides
-		typeset -ga lk_keybinds
-		(( ${#lk_keybinds} )) || lk_keybinds=(
-			"^[[1;9B"  # ⌘ + ↓
-			"^[[1;3B"  # alt + ↓
-		)
-		for k in "${lk_keybinds[@]}"; do bindkey "$k" walk-lk-widget; done
+		bindkey "^[[1;9B" walk-lk-widget  # ⌘ + ↓
+		bindkey "^[[1;3B" walk-lk-widget  # alt + ↓
 	' \
 	@zdharma-continuum/null
 
