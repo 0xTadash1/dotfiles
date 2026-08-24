@@ -102,8 +102,8 @@ zinit wait lucid light-mode for ver'develop' sbin'translate -> trans' \
 		#   A standard hyphen entered via keyboard is "hyphen-minus"
 		trans.stdin() { [[ -p /dev/stdin ]] && command cat || clippaste; }
 		trans.join_and_trim() { tr -d '\n' | tr -s '[:space:]' | sed "s/$(printf '\u2010') //g"; }
-		trans.e2j() { trans -b -s en -t ja; }
-		trans.j2e() { trans -b -s ja -t en; }
+		trans.e2j() { command trans -b -s en -t ja; }
+		trans.j2e() { command trans -b -s ja -t en; }
 
 		e2j() { trans.stdin | trans.join_and_trim | trans.e2j; }
 		j2e() { trans.stdin | trans.join_and_trim | trans.j2e; }
