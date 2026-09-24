@@ -35,6 +35,10 @@ assert_output "gxx.sh の atload が alias g1 を張る" \
 	'print -r -- ${aliases[g1]}' \
 	'g oneline'
 
+# trans.e2j / trans.j2e は command trans を呼ぶので、PATH に無いと壊れる。
+assert_cond "sbin の shim で trans が PATH に載る" \
+	'command -v trans >/dev/null'
+
 ##
 # bat: setup-bat の has'bat' ガード
 #
