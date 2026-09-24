@@ -20,6 +20,10 @@ source $TESTS_DIR/lib.zsh
 # variant は run スクリプトが渡す。実測値ではなく宣言値を期待値の根拠にする。
 # これが無いと「full から bat が消えた」を「bat なしが正解」として通してしまう。
 typeset -g TEST_VARIANT=${TEST_VARIANT-}
+
+# turbo / defer が動き出したことの目印。設定側のプラグイン構成に依存するので、
+# プラグインマネージャを替えたら見直すこと。
+typeset -g READY_MARKER=${READY_MARKER:-extract}
 case $TEST_VARIANT in
 	minimal|full) ;;
 	*)
@@ -112,8 +116,8 @@ run_pty_group() {
 
 	# 前提が成立しないまま流すと、未ロードの状態を仕様として記録してしまう。
 	# 警告で済ませずテストを実行しない。
-	if ! pty_wait_cond '(( ${+functions[extract]} ))' 60; then
-		fatal "turbo mode が動き出さなかった (TERM=$term)"
+	if ! pty_wait_cond "(( \${+functions[$READY_MARKER]} ))" 60; then
+		fatal "turbo mode が動き出さなかった (TERM=$term, marker=$READY_MARKER)"
 		print -ru2 -- "  起動時の出力: $PTY_START_OUTPUT"
 		pty_stop
 		return 1

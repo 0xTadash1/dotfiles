@@ -26,6 +26,9 @@
 #   WALK_SHA256 walk バイナリの checksum (既定は arch から決める)
 #   IMAGE       イメージ名の接頭辞 (既定 dotfiles-verify)
 #   PTY_TERM    test 時にセッションへ渡す TERM (既定 linux = p10k をスキップ)
+#   PTY_SKIP_BURST
+#               1 なら zinit のキュー消化を飛ばし、静止判定だけでロード完了を
+#               待つ。プラグインマネージャ移行後の経路を移行前に試すため
 
 emulate -L zsh
 setopt err_exit no_unset pipe_fail
@@ -224,6 +227,7 @@ case $action in
 			--env "TEST_VARIANT=$variant" \
 			--env "TEST_MODE=$mode" \
 			--env "PTY_TERM=${PTY_TERM:-linux}" \
+			--env "PTY_SKIP_BURST=${PTY_SKIP_BURST-}" \
 			"$image" test
 		;;
 	clean)
