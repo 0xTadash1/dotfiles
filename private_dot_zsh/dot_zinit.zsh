@@ -43,7 +43,7 @@ zinit light-mode for \
 zinit wait lucid light-mode for OMZP::extract
 
 zinit wait lucid light-mode for \
-	atload'zstyle ":prezto:module:terminal" auto-title "yes"' \
+	atinit'zstyle ":prezto:module:terminal" auto-title "yes"' \
 	PZTM::terminal
 
 #zinit wait lucid light-mode for proto'ssh' @0xTadash1/zsh-noob-init
