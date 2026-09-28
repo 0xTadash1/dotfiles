@@ -7,6 +7,8 @@ fi
 
 # Deferred plugins would otherwise have their output, errors included, sent to /dev/null
 zstyle ':antidote:bundle:*' defer-options '-12'
+zstyle ':antidote:snapshot' dir "${XDG_DATA_HOME:-$HOME/.local/share}/antidote/snapshots"
+zstyle ':antidote:snapshot' max 8
 
 source "${ZDOTDIR:-$HOME}/.antidote/antidote.zsh"
 antidote load
