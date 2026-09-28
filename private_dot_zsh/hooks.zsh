@@ -1,5 +1,13 @@
 # Called from pre:/post: in .zsh_plugins.txt
 
+function hook:smartcache:pre {
+	typeset -g ZSH_SMARTCACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/smartcache"
+}
+
+function hook:omzl-completion:post {
+	zstyle ':completion:*' cache-path "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompcache"
+}
+
 function hook:omzl-history:post {
 	unsetopt HIST_IGNORE_DUPS HIST_VERIFY
 }

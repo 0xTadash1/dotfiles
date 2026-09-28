@@ -1,5 +1,5 @@
 # Source this from .zshrc
-export ANTIDOTE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}/antidote"
+export ANTIDOTE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/antidote"
 
 if [[ ! -f "${ZDOTDIR:-$HOME}/.antidote/antidote.zsh" ]]; then
 	command git clone --depth=1 https://github.com/mattmc3/antidote.git "${ZDOTDIR:-$HOME}/.antidote"
