@@ -10,3 +10,8 @@ zstyle ':antidote:bundle:*' defer-options '-12'
 
 source "${ZDOTDIR:-$HOME}/.antidote/antidote.zsh"
 antidote load
+
+# Rebuild completions whenever the bundles change. The dump path is ez-compinit's default
+if [[ ${ZDOTDIR:-$HOME}/.zsh_plugins.zsh -nt ${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump ]]; then
+	command rm -f -- ${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump
+fi

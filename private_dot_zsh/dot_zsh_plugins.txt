@@ -6,7 +6,7 @@ $ZDOTDIR/hooks.zsh
 # antidote installs this itself, but loads it inside the first kind:defer bundle's conditional
 # Loaded up front so that condition cannot keep it from every deferred bundle
 romkatv/zsh-defer
-mattmc3/ez-compinit
+mattmc3/ez-compinit       pre:hook:ez-compinit:pre
 QuarticCat/zsh-smartcache pre:hook:smartcache:pre
 
 # Base Layer. Practical Settings

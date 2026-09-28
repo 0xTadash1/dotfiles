@@ -1,5 +1,9 @@
 # Called from pre:/post: in .zsh_plugins.txt
 
+function hook:ez-compinit:pre {
+	zstyle ':plugin:ez-compinit' use-cache yes
+}
+
 function hook:smartcache:pre {
 	typeset -g ZSH_SMARTCACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/smartcache"
 }
