@@ -1,0 +1,58 @@
+# Loaded by init.zsh via `antidote load`
+
+# Functions referenced by pre:/post: below
+$ZDOTDIR/hooks.zsh
+
+# antidote installs this itself, but loads it inside the first kind:defer bundle's conditional
+# Loaded up front so that condition cannot keep it from every deferred bundle
+romkatv/zsh-defer
+mattmc3/ez-compinit       pre:hook:ez-compinit:pre
+QuarticCat/zsh-smartcache pre:hook:smartcache:pre
+
+# Base Layer. Practical Settings
+# https://github.com/ohmyzsh/ohmyzsh
+ohmyzsh/ohmyzsh path:lib/completion.zsh post:hook:omzl-completion:post
+ohmyzsh/ohmyzsh path:lib/key-bindings.zsh
+ohmyzsh/ohmyzsh path:lib/history.zsh    post:hook:omzl-history:post
+ohmyzsh/ohmyzsh path:lib/clipboard.zsh
+
+0xTadash1/rc
+0xTadash1/gxx.sh kind:clone post:hook:gxx:post
+
+$ZDOTDIR/plugins.d/surround.zsh kind:defer
+
+kutsan/zsh-system-clipboard kind:defer conditional:'[[ ! -z "$(command -v pbcopy xclip xsel wl-copy)" ]]'
+
+# Utility
+0xTadash1/util.sh kind:defer
+0xTadash1/dirstax
+
+ohmyzsh/ohmyzsh      path:plugins/extract  kind:defer
+sorin-ionescu/prezto path:modules/terminal kind:defer pre:hook:pztm-terminal:pre
+
+hlissner/zsh-autopair kind:defer
+
+$ZDOTDIR/plugins.d/trans.zsh kind:defer conditional:'(( $+commands[trans] ))'
+
+# Enhancements
+0xTadash1/bat-into-tokyonight   kind:clone conditional:'(( $+commands[bat] ))' post:hook:bat-into-tokyonight:post
+$ZDOTDIR/plugins.d/walk.zsh     kind:defer conditional:'(( $+commands[walk] ))'
+$ZDOTDIR/plugins.d/lscolors.zsh kind:defer conditional:'(( $+commands[vivid] ))'
+$ZDOTDIR/plugins.d/zoxide.zsh   kind:defer conditional:'(( $+commands[zoxide] ))'
+
+#jeffreytse/zsh-vi-mode
+
+# UI/UX
+zdharma-continuum/fast-syntax-highlighting kind:defer
+
+Aloxaf/fzf-tab             kind:defer conditional:'(( $+commands[fzf] ))' post:hook:fzf-tab:post
+$ZDOTDIR/plugins.d/fzf.zsh kind:defer conditional:'(( $+commands[fzf] ))'
+junegunn/fzf-git.sh        kind:defer conditional:'(( $+commands[fzf] ))'
+#junegunn/fzf              path:shell/completion.zsh
+#junegunn/fzf              path:shell/key-bindings.zsh
+
+zsh-users/zsh-completions              path:src   kind:fpath
+zsh-users/zsh-autosuggestions          kind:defer post:hook:zsh-autosuggestions:post
+zsh-users/zsh-history-substring-search kind:defer post:hook:zsh-history-substring-search:post
+
+romkatv/powerlevel10k conditional:'[[ ! $TERM = "linux" ]]' pre:hook:p10k:pre post:hook:p10k:post
