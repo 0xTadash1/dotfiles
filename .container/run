@@ -1,0 +1,156 @@
+#!/usr/bin/env zsh
+#
+# Build and run the dotfiles verification container
+#
+#   .container/run build [minimal|full]  build the image
+#   .container/run sh    [minimal|full]  enter an interactive shell
+#   .container/run clean [minimal|full]  drop the plugin cache
+#
+# Defaults to full
+#
+# Environment:
+#   ENGINE      podman / docker (defaults to podman if available)
+
+emulate -L zsh
+setopt err_exit no_unset pipe_fail
+
+typeset HERE=${0:A:h}
+typeset REPO=${HERE:h}
+
+if [[ -z ${ENGINE-} ]]; then
+	if command -v podman >/dev/null 2>&1; then
+		ENGINE=podman
+	else
+		ENGINE=docker
+	fi
+fi
+
+# Pin the checksum too: tags can be replaced
+# Keep in sync with WALK_VERSION in the Dockerfile (sha256sum -c fails otherwise)
+typeset WALK_SHA256_AMD64=7c3b6e28fd0eee20170a07be5ceae001e466d8948b32feb005c447f4cf7c3c21
+typeset WALK_SHA256_ARM64=42664c11d54d1e7f7ca5131c34197de120f03d535238d6cadbe03bba8303ebc8
+
+# Emulation does not work: under qemu-user, Arch's zsh hangs when it forks an external command
+# (builtins work. Alpine's musl zsh works, so it is specific to glibc + qemu-user + zsh)
+# The official archlinux image is amd64 only, so arm64 uses an unofficial rebuild
+typeset PLATFORM BASE_IMAGE WALK_ARCH WALK_SHA256
+case $(uname -m) in
+	arm64|aarch64)
+		PLATFORM=linux/arm64
+		BASE_IMAGE=docker.io/lopsided/archlinux:latest
+		WALK_ARCH=arm64
+		WALK_SHA256=$WALK_SHA256_ARM64
+		;;
+	*)
+		PLATFORM=linux/amd64
+		BASE_IMAGE=docker.io/library/archlinux:base
+		WALK_ARCH=amd64
+		WALK_SHA256=$WALK_SHA256_AMD64
+		;;
+esac
+
+typeset IMAGE=dotfiles-verify
+
+# For hosts without sha256sum (macOS ships shasum)
+sha256_of_stdin() {
+	if command -v sha256sum >/dev/null 2>&1; then
+		sha256sum | awk '{print $1}'
+	else
+		shasum -a 256 | awk '{print $1}'
+	fi
+}
+
+# Digest of the build inputs. entrypoint compares it with the one in the volume
+build_digest() {
+	{
+		print -r -- "$BASE_IMAGE"
+		print -r -- "$WALK_ARCH"
+		print -r -- "$WALK_SHA256"
+		cat "$HERE/Dockerfile"
+	} | sha256_of_stdin
+}
+
+usage() {
+	print -ru2 -- "usage: ${ZSH_ARGZERO:t} {build|sh|clean} [minimal|full]"
+	exit 2
+}
+
+(( $# >= 1 )) || usage
+
+typeset action=$1
+typeset variant=${2:-full}
+
+case $variant in
+	minimal|full) ;;
+	*) print -ru2 -- "unknown variant: $variant"; usage ;;
+esac
+
+typeset image="${IMAGE}:${variant}"
+typeset vol_antidote="${IMAGE}-${variant}-antidote"
+typeset vol_cache="${IMAGE}-${variant}-cache"
+
+# No --force: it removes an in-use volume together with the containers using it
+# When it is in use, volume rm fails instead
+drop_volumes() {
+	typeset v
+	for v in "$vol_antidote" "$vol_cache"; do
+		if $ENGINE volume inspect "$v" >/dev/null 2>&1; then
+			$ENGINE volume rm "$v" >/dev/null
+		fi
+	done
+}
+
+typeset -a run_args=(
+	--rm
+	--platform "$PLATFORM"
+	--volume "${REPO}:/mnt/dotfiles:ro"
+	--volume "${vol_antidote}:/home/dev/.zsh/.antidote"
+	--volume "${vol_cache}:/home/dev/.cache"
+	# Disable SELinux labeling:
+	# - p10k untars gitstatusd with its labels, and podman assigns a different MCS
+	#   category per run, so the next container cannot read gitstatusd in the volume
+	# - :z does not help (the labels are applied after the untar)
+	# - disposable container, so prefer the same startup path as on the real machine over isolation
+	--security-opt label=disable
+)
+
+case $action in
+	build)
+		$ENGINE build \
+			--platform "$PLATFORM" \
+			--target "$variant" \
+			--build-arg "BASE_IMAGE=$BASE_IMAGE" \
+			--build-arg "WALK_ARCH=$WALK_ARCH" \
+			--build-arg "WALK_SHA256=$WALK_SHA256" \
+			--build-arg "BUILD_DIGEST=$(build_digest)" \
+			--tag "$image" \
+			"$HERE"
+		;;
+	sh)
+		# Pass the host terminfo instead of baking it in (see entrypoint for why)
+		typeset host_terminfo=
+		if [[ -n ${TERM-} ]] && command -v infocmp >/dev/null 2>&1; then
+			host_terminfo=$(infocmp -x "$TERM" 2>/dev/null) || host_terminfo=
+		fi
+		typeset -a sh_env=(
+			--env "TERM=${TERM:-xterm-256color}"
+			--env "HOST_TERMINFO=$host_terminfo"
+		)
+		# p10k and bat detect truecolor from $COLORTERM
+		# Only when non-empty: some implementations treat empty as "set but empty"
+		if [[ -n ${COLORTERM-} ]]; then
+			sh_env+=(--env "COLORTERM=$COLORTERM")
+		fi
+		# dirstax picks the alt keys in the container, but ⌘ is preferred from a Mac
+		if [[ $(uname -s) == Darwin ]]; then
+			sh_env+=(--env 'DIRSTAX_KEYBINDS=darwin')
+		fi
+		$ENGINE run -it "${run_args[@]}" "${sh_env[@]}" "$image"
+		;;
+	clean)
+		drop_volumes
+		;;
+	*)
+		usage
+		;;
+esac
