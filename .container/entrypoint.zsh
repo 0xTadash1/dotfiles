@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 #
-# Place the config in $HOME by decoding chezmoi names, then start an interactive shell
+# Place the config in $HOME by decoding chezmoi names, then start an interactive shell or runner
 
 emulate -L zsh
 setopt err_exit no_unset pipe_fail
@@ -9,15 +9,18 @@ setopt err_exit no_unset pipe_fail
 typeset SRC=/mnt/dotfiles
 
 # Volume freshness: volumes outlive image rebuilds, so after a package change a broken
-# install left in an old volume is not fixed. Dropping it is left to the user
+# install left in an old volume is not fixed by warm. Dropping it is left to the user
 typeset image_digest=/usr/local/lib/dotfiles-verify/build-digest
 typeset volume_digest=$HOME/.cache/dotfiles-verify.build-digest
+typeset -i fresh_cache=0
 if [[ ! -f $volume_digest ]]; then
+	fresh_cache=1
 	cp -- $image_digest $volume_digest
 elif [[ "$(<$volume_digest)" != "$(<$image_digest)" ]]; then
 	print -ru2 -- "entrypoint: the plugin cache does not match this image."
 	print -ru2 -- "  The image environment (packages, etc.) has changed, so"
 	print -ru2 -- "  drop the cache and retry:"
+	print -ru2 -- "    .container/run test <variant> cold"
 	print -ru2 -- "    .container/run clean <variant>"
 	exit 1
 fi
@@ -73,6 +76,16 @@ case ${1:-shell} in
 		fi
 		# Login shell: the .zprofile -> .profile chain only runs there
 		exec zsh -l
+		;;
+	test)
+		shift
+		# The only time limit is here. Only an empty cache (cold, or right after build or
+		# clean) reaches the external network, so the limit is longer then
+		typeset -i limit=45 rc
+		(( fresh_cache )) && limit=120
+		timeout -k 5 $limit zsh $SRC/.container/tests/runner.zsh "$@" && rc=0 || rc=$?
+		(( rc == 124 || rc == 137 )) && print -ru2 -- "  FATAL the whole run did not finish in ${limit}s"
+		exit $rc
 		;;
 	*)
 		exec "$@"

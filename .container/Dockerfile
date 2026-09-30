@@ -4,7 +4,7 @@
 #         └─ tools ─── full
 #
 # Baked in: packages, walk, the user and volume mount points, the build input digest
-# entrypoint is used from the mounted repo
+# entrypoint, tests and stubs are used from the mounted repo
 
 # run passes BASE_IMAGE, WALK_ARCH and WALK_SHA256 for the host arch (see run for why)
 ARG BASE_IMAGE

@@ -2,11 +2,12 @@
 #
 # Build and run the dotfiles verification container
 #
-#   .container/run build [minimal|full]  build the image
-#   .container/run sh    [minimal|full]  enter an interactive shell
-#   .container/run clean [minimal|full]  drop the plugin cache
+#   .container/run build [minimal|full]              build the image
+#   .container/run sh    [minimal|full]              enter an interactive shell
+#   .container/run test  [minimal|full] [warm|cold]  run the non-interactive tests
+#   .container/run clean [minimal|full]              drop the plugin cache
 #
-# Defaults to full
+# Defaults are full and warm. cold drops the cache before running
 #
 # Environment:
 #   ENGINE      podman / docker (defaults to podman if available)
@@ -71,7 +72,7 @@ build_digest() {
 }
 
 usage() {
-	print -ru2 -- "usage: ${ZSH_ARGZERO:t} {build|sh|clean} [minimal|full]"
+	print -ru2 -- "usage: ${ZSH_ARGZERO:t} {build|sh|test|clean} [minimal|full] [warm|cold]"
 	exit 2
 }
 
@@ -79,10 +80,16 @@ usage() {
 
 typeset action=$1
 typeset variant=${2:-full}
+typeset mode=${3:-warm}
 
 case $variant in
 	minimal|full) ;;
 	*) print -ru2 -- "unknown variant: $variant"; usage ;;
+esac
+
+case $mode in
+	warm|cold) ;;
+	*) print -ru2 -- "unknown mode: $mode"; usage ;;
 esac
 
 typeset image="${IMAGE}:${variant}"
@@ -138,14 +145,25 @@ case $action in
 		)
 		# p10k and bat detect truecolor from $COLORTERM
 		# Only when non-empty: some implementations treat empty as "set but empty"
+		# Not passed to test: keep results independent of the host terminal
 		if [[ -n ${COLORTERM-} ]]; then
 			sh_env+=(--env "COLORTERM=$COLORTERM")
 		fi
 		# dirstax picks the alt keys in the container, but ⌘ is preferred from a Mac
+		# Not passed to test (verify the config as is)
 		if [[ $(uname -s) == Darwin ]]; then
 			sh_env+=(--env 'DIRSTAX_KEYBINDS=darwin')
 		fi
 		$ENGINE run -it "${run_args[@]}" "${sh_env[@]}" "$image"
+		;;
+	test)
+		[[ $mode == warm ]] || drop_volumes
+		# -t: without a terminal, p10k cannot set monitor on the first start (zsh -i)
+		# and gitstatus fails to initialize
+		$ENGINE run -t "${run_args[@]}" \
+			--env "TEST_VARIANT=$variant" \
+			--env "TEST_MODE=$mode" \
+			"$image" test
 		;;
 	clean)
 		drop_volumes

@@ -1,0 +1,5 @@
+#!/bin/sh
+#
+# Stub that only shows xclip exists, to pass the zsh-system-clipboard conditional
+# Reading and writing are plugin behavior and not tested. The real xclip fails at runtime without an X server
+exit 0
